@@ -14,7 +14,7 @@ const adminRoutes = require('./routes/admin');
 const app = express();
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173', credentials: true }));
+app.use(cors({ origin: '*', credentials: false }));
 app.use(express.json({ limit: '10kb' }));
 
 // Rate limiting
@@ -29,14 +29,18 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 
-app.get('/api/health', (req, res) => res.json({ status: 'SafeSphere AI server running' }));
+app.get('/api/health', (req, res) => res.json({ status: 'SafeSphere AI server running', time: new Date() }));
 
 // MongoDB + Server start
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 10000;
 mongoose
   .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/safesphere')
   .then(() => {
     console.log('✅ MongoDB connected');
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT}`));
   })
-  .catch((err) => console.error('MongoDB error:', err));
+  .catch((err) => {
+    console.error('MongoDB error:', err);
+    // Start server even if MongoDB fails
+    app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on port ${PORT} (no DB)`));
+  });
