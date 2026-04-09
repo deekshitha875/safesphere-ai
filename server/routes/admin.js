@@ -11,7 +11,7 @@ const adminOnly = async (req, res, next) => {
 };
 
 // Seed 3 default admins (run once)
-router.post('/seed', async (req, res) => {
+router.get('/seed', async (req, res) => {
   try {
     const admins = [
       { name: 'Admin Arjun', email: 'admin1@safesphere.ai', password: 'Admin@123', role: 'admin', plan: 'enterprise' },
