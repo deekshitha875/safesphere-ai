@@ -140,7 +140,7 @@ export default function Hero() {
                   className="px-7 py-3.5 rounded-xl glass border border-white/10 text-white font-semibold text-sm hover:border-brand-500/50 transition-all flex items-center gap-2">
                   <motion.span className="w-6 h-6 rounded-full bg-brand-500/20 flex items-center justify-center text-xs"
                     animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }}>▶</motion.span>
-                  Watch Demo
+                  Try Live Demo
                 </Link>
               </motion.div>
             </motion.div>
@@ -149,10 +149,10 @@ export default function Hero() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.5 }}
               className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { target: 98, suffix: '%', label: 'Accuracy' },
-                { target: 2, suffix: 'M+', label: 'Protected' },
-                { target: 150, suffix: '+', label: 'Platforms' },
-                { target: 50, suffix: 'ms', label: 'Response' },
+                { target: 98, suffix: '%', label: 'Detection Rate' },
+                { target: 500, suffix: '+', label: 'Reports Filed' },
+                { target: 15, suffix: '+', label: 'Platforms' },
+                { target: 24, suffix: 'hr', label: 'Response Time' },
               ].map((s, i) => (
                 <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + i * 0.1 }} className="text-center">

@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -26,7 +27,6 @@ export default function Login() {
       <div className="absolute inset-0 bg-gradient-radial from-brand-600/8 via-transparent to-transparent" />
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
         className="relative w-full max-w-md">
-
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">S</div>
@@ -35,7 +35,6 @@ export default function Login() {
           <h1 className="font-display text-2xl font-bold text-white mb-2">Welcome back</h1>
           <p className="text-slate-400 text-sm">Sign in to your SafeSphere account</p>
         </div>
-
         <form onSubmit={handleSubmit} className="glass-dark rounded-2xl p-6 space-y-4">
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">Email</label>
@@ -43,11 +42,26 @@ export default function Login() {
               placeholder="your@email.com" required className={inp} />
           </div>
           <div>
-            <label className="block text-slate-400 text-xs font-medium mb-1.5">Password</label>
-            <input type="password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })}
-              placeholder="••••••••" required className={inp} />
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-slate-400 text-xs font-medium">Password</label>
+              <span className="text-xs text-brand-400 cursor-pointer hover:text-brand-300 transition-colors">Forgot password?</span>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={form.password}
+                onChange={e => setForm({ ...form, password: e.target.value })}
+                placeholder="••••••••" required
+                className={inp + " pr-16"} />
+              <button type="button" onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white transition-colors font-medium select-none">
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && (
+            <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
+          )}
           <button type="submit" disabled={loading}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 to-purple-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity btn-glow disabled:opacity-50">
             {loading ? "Signing in..." : "Sign In"}
@@ -57,7 +71,6 @@ export default function Login() {
             <Link to="/register" className="text-brand-400 hover:text-brand-300 font-medium">Sign up free</Link>
           </p>
         </form>
-
         <div className="mt-6 text-center">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-px bg-white/10" />
@@ -73,7 +86,6 @@ export default function Login() {
             🛡️ Login as Admin
           </Link>
         </div>
-
       </motion.div>
     </div>
   );

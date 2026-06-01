@@ -16,6 +16,7 @@ import FileComplaint from "./pages/FileComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
+import NotFound from "./pages/NotFound";
 
 function UserLayout({ children }) {
   return (
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/file-complaint" element={<UserLayout><FileComplaint /></UserLayout>} />
         <Route path="/dashboard" element={<ProtectedRoute><UserLayout><Dashboard /></UserLayout></ProtectedRoute>} />
         <Route path="/my-complaints" element={<ProtectedRoute><UserLayout><MyComplaints /></UserLayout></ProtectedRoute>} />
+        <Route path="*" element={<UserLayout><NotFound /></UserLayout>} />
       </Routes>
     </AuthProvider>
   );

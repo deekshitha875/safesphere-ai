@@ -25,6 +25,11 @@ export default function Navbar() {
     { to: '/blog', label: 'Blog' },
   ];
 
+  const isActive = (to) => {
+    if (to.startsWith('/#')) return location.pathname === '/';
+    return location.pathname === to;
+  };
+
   return (
     <motion.nav
       initial={{ y: -80 }}
@@ -50,7 +55,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             {links.map(l => (
               <a key={l.to} href={l.to}
-                className="text-sm text-slate-400 hover:text-white transition-colors duration-200 font-medium">
+                className={`text-sm font-medium transition-colors duration-200 ${isActive(l.to) ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
                 {l.label}
               </a>
             ))}
@@ -60,8 +65,14 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-3">
             {user ? (
               <>
-                <Link to="/dashboard" className="text-sm text-slate-300 hover:text-white transition-colors">Dashboard</Link>
-                <Link to="/my-complaints" className="text-sm text-slate-300 hover:text-white transition-colors">My Reports</Link>
+                <Link to="/dashboard"
+                  className={`text-sm transition-colors ${location.pathname === '/dashboard' ? 'text-white font-semibold' : 'text-slate-300 hover:text-white'}`}>
+                  Dashboard
+                </Link>
+                <Link to="/my-complaints"
+                  className={`text-sm transition-colors ${location.pathname === '/my-complaints' ? 'text-white font-semibold' : 'text-slate-300 hover:text-white'}`}>
+                  My Reports
+                </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" className="text-sm px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-all font-medium">
                     🛡️ Admin
@@ -70,13 +81,13 @@ export default function Navbar() {
                 <Link to="/file-complaint" className="text-sm px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold hover:opacity-90 transition-opacity">
                   🚨 Report
                 </Link>
-                <button onClick={logout} className="text-sm px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-brand-500 hover:text-white transition-all">
-                  Logout
-                </button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-sm text-slate-300 hover:text-white transition-colors">Login</Link>
+                <Link to="/login"
+                  className={`text-sm transition-colors ${location.pathname === '/login' ? 'text-white font-semibold' : 'text-slate-300 hover:text-white'}`}>
+                  Login
+                </Link>
                 <Link to="/register" className="text-sm px-4 py-2 rounded-lg bg-gradient-to-r from-brand-500 to-purple-600 text-white font-semibold hover:opacity-90 transition-opacity btn-glow">
                   Get Started
                 </Link>
@@ -106,15 +117,21 @@ export default function Navbar() {
           >
             <div className="px-4 py-4 space-y-3">
               {links.map(l => (
-                <a key={l.to} href={l.to} className="block text-slate-300 hover:text-white py-2 text-sm font-medium">
+                <a key={l.to} href={l.to}
+                  className={`block py-2 text-sm font-medium ${isActive(l.to) ? 'text-white' : 'text-slate-300 hover:text-white'}`}>
                   {l.label}
                 </a>
               ))}
               <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
                 {user ? (
                   <>
-                    <Link to="/dashboard" className="text-sm text-slate-300 py-2">Dashboard</Link>
-                    <button onClick={logout} className="text-sm text-left text-slate-400">Logout</button>
+                    <Link to="/dashboard" className={`text-sm py-2 ${location.pathname === '/dashboard' ? 'text-white font-semibold' : 'text-slate-300'}`}>Dashboard</Link>
+                    <Link to="/my-complaints" className={`text-sm py-2 ${location.pathname === '/my-complaints' ? 'text-white font-semibold' : 'text-slate-300'}`}>My Reports</Link>
+                    <Link to="/file-complaint" className="text-sm py-2 text-red-400 font-semibold">🚨 Report Incident</Link>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="text-sm py-2 text-red-400">🛡️ Admin Panel</Link>
+                    )}
+                    <button onClick={logout} className="text-sm text-left text-slate-400 py-2">Logout</button>
                   </>
                 ) : (
                   <>
