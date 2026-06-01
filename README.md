@@ -8,7 +8,7 @@ A full-stack MERN application that detects, prevents, and manages cyberbullying 
 
 - **Real-Time Detection** — AI scans messages instantly with 98% accuracy
 - **Sentiment Analysis** — Detects hate, toxicity, harassment, threats
-- **400+ Harmful Words** — Comprehensive detection including Hindi/Hinglish
+- **400+ Harmful Words** — Comprehensive detection including Hindi/English
 - **File a Complaint** — Anyone can report cyberbullying (no login required)
 - **Admin Control Center** — 3 certified admins monitor and respond to complaints
 - **Live Demo** — Try the AI analyzer in real time
