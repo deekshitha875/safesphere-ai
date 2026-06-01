@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const complaintSchema = new mongoose.Schema({
-  reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  reportedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
   reportedByName: { type: String },
   reportedByEmail: { type: String },
   offenderName: { type: String, required: true },
