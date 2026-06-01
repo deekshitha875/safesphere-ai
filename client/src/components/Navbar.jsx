@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const { user, logout } = useAuth();
   const location = useLocation();
 
@@ -15,7 +16,7 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => setOpen(false), [location]);
+  useEffect(() => { setOpen(false); setProfileOpen(false); }, [location]);
 
   const links = [
     { to: '/#features', label: 'Features' },
@@ -75,12 +76,44 @@ export default function Navbar() {
                 </Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" className="text-sm px-3 py-1.5 rounded-lg bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500/30 transition-all font-medium">
-                    🛡️ Admin
+                    Admin
                   </Link>
                 )}
                 <Link to="/file-complaint" className="text-sm px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-rose-600 text-white font-semibold hover:opacity-90 transition-opacity">
-                  🚨 Report
+                  Report
                 </Link>
+                {/* Profile avatar dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm hover:opacity-90 transition-opacity focus:outline-none"
+                    aria-label="Profile menu"
+                  >
+                    {user.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </button>
+                  <AnimatePresence>
+                    {profileOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-44 glass-dark rounded-xl border border-white/10 shadow-xl overflow-hidden"
+                      >
+                        <div className="px-4 py-3 border-b border-white/10">
+                          <p className="text-white text-sm font-medium truncate">{user.name}</p>
+                          <p className="text-slate-400 text-xs truncate">{user.email}</p>
+                        </div>
+                        <Link to="/profile" className="block px-4 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
+                          My Profile
+                        </Link>
+                        <button onClick={logout} className="w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 transition-colors">
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </>
             ) : (
               <>
@@ -127,9 +160,10 @@ export default function Navbar() {
                   <>
                     <Link to="/dashboard" className={`text-sm py-2 ${location.pathname === '/dashboard' ? 'text-white font-semibold' : 'text-slate-300'}`}>Dashboard</Link>
                     <Link to="/my-complaints" className={`text-sm py-2 ${location.pathname === '/my-complaints' ? 'text-white font-semibold' : 'text-slate-300'}`}>My Reports</Link>
-                    <Link to="/file-complaint" className="text-sm py-2 text-red-400 font-semibold">🚨 Report Incident</Link>
+                    <Link to="/profile" className={`text-sm py-2 ${location.pathname === '/profile' ? 'text-white font-semibold' : 'text-slate-300'}`}>My Profile</Link>
+                    <Link to="/file-complaint" className="text-sm py-2 text-red-400 font-semibold">Report Incident</Link>
                     {user.role === 'admin' && (
-                      <Link to="/admin" className="text-sm py-2 text-red-400">🛡️ Admin Panel</Link>
+                      <Link to="/admin" className="text-sm py-2 text-red-400">Admin Panel</Link>
                     )}
                     <button onClick={logout} className="text-sm text-left text-slate-400 py-2">Logout</button>
                   </>

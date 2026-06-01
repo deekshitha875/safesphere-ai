@@ -8,6 +8,8 @@ const userSchema = new mongoose.Schema({
   plan: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
   createdAt: { type: Date, default: Date.now },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Date },
 });
 
 userSchema.pre('save', async function (next) {

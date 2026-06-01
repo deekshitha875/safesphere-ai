@@ -1,4 +1,39 @@
-const router = require('express').Router();
+import os
+
+# 1. Update server/models/User.js - add resetToken fields
+user_model = r"""const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  password: { type: String, required: true, minlength: 6 },
+  plan: { type: String, enum: ['free', 'pro', 'enterprise'], default: 'free' },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  createdAt: { type: Date, default: Date.now },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Date },
+});
+
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 12);
+  next();
+});
+
+userSchema.methods.comparePassword = function (candidate) {
+  return bcrypt.compare(candidate, this.password);
+};
+
+module.exports = mongoose.model('User', userSchema);
+"""
+
+with open('server/models/User.js', 'w', encoding='utf-8', newline='\n') as f:
+    f.write(user_model)
+print('User.js written')
+
+# 2. Update server/routes/auth.js - add forgot/reset/profile routes
+auth_routes = r"""const router = require('express').Router();
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
@@ -155,3 +190,22 @@ router.put('/profile', authMiddleware, async (req, res) => {
 });
 
 module.exports = router;
+"""
+
+with open('server/routes/auth.js', 'w', encoding='utf-8', newline='\n') as f:
+    f.write(auth_routes)
+print('auth.js written')
+
+# 3. Append email config to server/.env
+env_path = 'server/.env'
+with open(env_path, 'r', encoding='utf-8') as f:
+    env_content = f.read()
+
+if 'EMAIL_USER' not in env_content:
+    with open(env_path, 'a', encoding='utf-8') as f:
+        f.write('\nEMAIL_USER=safesphereai.help@gmail.com\nEMAIL_PASS=your_app_password_here\n')
+    print('.env updated with email config')
+else:
+    print('.env already has EMAIL_USER, skipping')
+
+print('All server files done')

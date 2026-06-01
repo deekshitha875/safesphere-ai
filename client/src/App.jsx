@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ToastProvider } from "./components/Toast";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Chatbot from "./components/Chatbot";
@@ -17,6 +18,8 @@ import MyComplaints from "./pages/MyComplaints";
 import AdminLogin from "./pages/AdminLogin";
 import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
+import ForgotPassword from "./pages/ForgotPassword";
+import Profile from "./pages/Profile";
 
 function UserLayout({ children }) {
   return (
@@ -34,20 +37,24 @@ function UserLayout({ children }) {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Routes>
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
-        <Route path="/" element={<UserLayout><Home /></UserLayout>} />
-        <Route path="/login" element={<UserLayout><Login /></UserLayout>} />
-        <Route path="/register" element={<UserLayout><Register /></UserLayout>} />
-        <Route path="/demo" element={<UserLayout><Demo /></UserLayout>} />
-        <Route path="/blog" element={<UserLayout><Blog /></UserLayout>} />
-        <Route path="/file-complaint" element={<UserLayout><FileComplaint /></UserLayout>} />
-        <Route path="/dashboard" element={<ProtectedRoute><UserLayout><Dashboard /></UserLayout></ProtectedRoute>} />
-        <Route path="/my-complaints" element={<ProtectedRoute><UserLayout><MyComplaints /></UserLayout></ProtectedRoute>} />
-        <Route path="*" element={<UserLayout><NotFound /></UserLayout>} />
-      </Routes>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <Routes>
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="/" element={<UserLayout><Home /></UserLayout>} />
+          <Route path="/login" element={<UserLayout><Login /></UserLayout>} />
+          <Route path="/register" element={<UserLayout><Register /></UserLayout>} />
+          <Route path="/forgot-password" element={<UserLayout><ForgotPassword /></UserLayout>} />
+          <Route path="/demo" element={<UserLayout><Demo /></UserLayout>} />
+          <Route path="/blog" element={<UserLayout><Blog /></UserLayout>} />
+          <Route path="/file-complaint" element={<UserLayout><FileComplaint /></UserLayout>} />
+          <Route path="/dashboard" element={<ProtectedRoute><UserLayout><Dashboard /></UserLayout></ProtectedRoute>} />
+          <Route path="/my-complaints" element={<ProtectedRoute><UserLayout><MyComplaints /></UserLayout></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><UserLayout><Profile /></UserLayout></ProtectedRoute>} />
+          <Route path="*" element={<UserLayout><NotFound /></UserLayout>} />
+        </Routes>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

@@ -1,14 +1,23 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { login, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      setSuccessMsg(location.state.successMessage);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,6 +45,9 @@ export default function Login() {
           <p className="text-slate-400 text-sm">Sign in to your SafeSphere account</p>
         </div>
         <form onSubmit={handleSubmit} className="glass-dark rounded-2xl p-6 space-y-4">
+          {successMsg && (
+            <p className="text-green-400 text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-2">{successMsg}</p>
+          )}
           <div>
             <label className="block text-slate-400 text-xs font-medium mb-1.5">Email</label>
             <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
@@ -44,7 +56,7 @@ export default function Login() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-slate-400 text-xs font-medium">Password</label>
-              <span className="text-xs text-brand-400 cursor-pointer hover:text-brand-300 transition-colors">Forgot password?</span>
+              <Link to="/forgot-password" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">Forgot password?</Link>
             </div>
             <div className="relative">
               <input
@@ -83,7 +95,7 @@ export default function Login() {
             style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)", color: "#f87171" }}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.15)"}
             onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.08)"}>
-            🛡️ Login as Admin
+            Shield Login as Admin
           </Link>
         </div>
       </motion.div>
