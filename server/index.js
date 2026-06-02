@@ -13,6 +13,7 @@ const adminRoutes = require("./routes/admin");
 
 const app = express();
 
+app.set("trust proxy", 1);
 app.use(cors({ origin: "*", credentials: false }));
 app.use(express.json({ limit: "10mb" }));
 
