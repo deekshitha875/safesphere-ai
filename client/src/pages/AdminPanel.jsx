@@ -272,6 +272,105 @@ export default function AdminPanel() {
                   )}
                 </div>
               ))}
+
+              {/* Selected complaint detail panel */}
+              {sel && (
+                <div style={{ position: "fixed", inset: 0, zIndex: 50, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+                  onClick={e => { if (e.target === e.currentTarget) setSel(null); }}>
+                  <div style={{ background: "#0f172a", border: "1px solid rgba(99,102,241,0.3)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 620, maxHeight: "85vh", overflowY: "auto" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <div>
+                        <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 600, color: SCFG[sel.status]?.color, background: SCFG[sel.status]?.bg, border: SCFG[sel.status]?.border, marginRight: 8 }}>{SCFG[sel.status]?.label}</span>
+                        <span style={{ padding: "2px 8px", borderRadius: 20, fontSize: 11, fontWeight: 700, color: VCFG[sel.severity]?.color, background: VCFG[sel.severity]?.bg, border: VCFG[sel.severity]?.border }}>{sel.severity?.toUpperCase()}</span>
+                      </div>
+                      <button onClick={() => setSel(null)} style={{ background: "rgba(255,255,255,0.06)", border: "none", color: "#94a3b8", cursor: "pointer", borderRadius: 8, padding: "4px 10px", fontSize: 16 }}>✕</button>
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <p style={{ color: "#64748b", fontSize: 11, marginBottom: 4 }}>COMPLAINT FROM</p>
+                      <p style={{ color: "#818cf8", fontSize: 13, fontWeight: 600, margin: 0 }}>{sel.reportedBy?.name || sel.reportedByName || "Anonymous"} &lt;{sel.reportedBy?.email || sel.reportedByEmail || "N/A"}&gt;</p>
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <p style={{ color: "#64748b", fontSize: 11, marginBottom: 4 }}>OFFENDER</p>
+                      <p style={{ color: "#f87171", fontSize: 13, fontWeight: 600, margin: 0 }}>{sel.offenderName} on {sel.offenderPlatform}</p>
+                    </div>
+
+                    <div style={{ background: "rgba(255,255,255,0.03)", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                      <p style={{ color: "#64748b", fontSize: 11, marginBottom: 6 }}>INCIDENT DESCRIPTION</p>
+                      <p style={{ color: "#cbd5e1", fontSize: 13, lineHeight: 1.6, margin: 0 }}>{sel.incidentDescription}</p>
+                    </div>
+
+                    <div style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: 10, padding: 14, marginBottom: 14 }}>
+                      <p style={{ color: "#f87171", fontSize: 11, marginBottom: 6 }}>HARMFUL CONTENT</p>
+                      <p style={{ color: "#cbd5e1", fontSize: 13, lineHeight: 1.6, margin: 0, fontStyle: "italic" }}>"{sel.harmfulContent}"</p>
+                    </div>
+
+                    {sel.detectedWords?.length > 0 && (
+                      <div style={{ marginBottom: 14 }}>
+                        <p style={{ color: "#64748b", fontSize: 11, marginBottom: 6 }}>DETECTED WORDS ({sel.detectedWords.length})</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                          {sel.detectedWords.map(w => <span key={w} style={{ padding: "2px 8px", borderRadius: 6, background: "rgba(239,68,68,0.1)", color: "#f87171", border: "1px solid rgba(239,68,68,0.2)", fontSize: 11 }}>{w}</span>)}
+                        </div>
+                      </div>
+                    )}
+
+                    {sel.evidenceImages?.length > 0 && (
+                      <div style={{ marginBottom: 14 }}>
+                        <p style={{ color: "#64748b", fontSize: 11, marginBottom: 8 }}>EVIDENCE SCREENSHOTS ({sel.evidenceImages.length})</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                          {sel.evidenceImages.map((img, i) => (
+                            <div key={i}>
+                              <img src={img.data} alt={img.name} style={{ width: 120, height: 90, objectFit: "cover", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer" }}
+                                onClick={() => window.open(img.data, "_blank")} />
+                              <p style={{ color: "#475569", fontSize: 10, marginTop: 4, textAlign: "center", width: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{img.name}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16, marginTop: 8 }}>
+                      <p style={{ color: "#94a3b8", fontSize: 12, fontWeight: 600, marginBottom: 10 }}>ADMIN RESPONSE</p>
+                      <div style={{ marginBottom: 10 }}>
+                        <label style={{ color: "#64748b", fontSize: 11, display: "block", marginBottom: 4 }}>Update Status</label>
+                        <select value={af.status} onChange={e => setAf({ ...af, status: e.target.value })} style={{ ...inp, marginBottom: 0 }}>
+                          <option value="pending">Pending</option>
+                          <option value="under_review">Under Review</option>
+                          <option value="resolved">Resolved</option>
+                          <option value="dismissed">Dismissed</option>
+                        </select>
+                      </div>
+                      <div style={{ marginBottom: 10 }}>
+                        <label style={{ color: "#64748b", fontSize: 11, display: "block", marginBottom: 4 }}>Admin Notes (visible to user)</label>
+                        <textarea value={af.adminNotes} onChange={e => setAf({ ...af, adminNotes: e.target.value })}
+                          placeholder="Add notes about this complaint..." rows={2}
+                          style={{ ...inp, resize: "vertical" }} />
+                      </div>
+                      <div style={{ marginBottom: 14 }}>
+                        <label style={{ color: "#64748b", fontSize: 11, display: "block", marginBottom: 4 }}>Action Taken</label>
+                        <textarea value={af.adminAction} onChange={e => setAf({ ...af, adminAction: e.target.value })}
+                          placeholder="Describe the action taken..." rows={2}
+                          style={{ ...inp, resize: "vertical" }} />
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 6 }}>
+                          {QR.slice(0, 3).map(q => (
+                            <button key={q} type="button" onClick={() => setAf({ ...af, adminAction: q })}
+                              style={{ padding: "3px 8px", borderRadius: 6, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", color: "#818cf8", cursor: "pointer", fontSize: 10 }}>
+                              {q.slice(0, 35)}...
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button onClick={() => setSel(null)} style={{ flex: 1, padding: "10px", borderRadius: 10, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", color: "#94a3b8", cursor: "pointer", fontSize: 13 }}>Cancel</button>
+                        <button onClick={saveAct} disabled={saving} style={{ flex: 2, padding: "10px", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", border: "none", color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 700, opacity: saving ? 0.6 : 1 }}>
+                          {saving ? "Saving..." : "Save Response"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
