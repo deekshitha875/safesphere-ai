@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
@@ -95,6 +97,33 @@ export default function Register() {
             className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-500 to-purple-600 text-white font-semibold text-sm hover:opacity-90 transition-opacity btn-glow disabled:opacity-50">
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
+
+          {/* Google Sign-In */}
+          <div className="flex items-center gap-3 my-2">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-slate-600 text-xs">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                try {
+                  const { data } = await axios.post('/api/auth/google', { credential: credentialResponse.credential });
+                  localStorage.setItem('ss_token', data.token);
+                  localStorage.setItem('ss_user', JSON.stringify(data.user));
+                  window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard';
+                } catch (err) {
+                  setErrors({ general: 'Google sign-in failed. Please try again.' });
+                }
+              }}
+              onError={() => setErrors({ general: 'Google sign-in failed' })}
+              theme="filled_black"
+              shape="rectangular"
+              text="signup_with_google"
+              width="360"
+            />
+          </div>
+
           <p className="text-center text-slate-400 text-sm">
             Already have an account?{' '}
             <Link to="/login" className="text-brand-400 hover:text-brand-300 font-medium">Sign in</Link>

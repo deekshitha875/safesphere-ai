@@ -7,6 +7,13 @@ import { useAuth } from '../context/AuthContext';
 
 const PIE_COLORS = { safe: '#10b981', toxic: '#f59e0b', hate: '#ef4444', harassment: '#8b5cf6' };
 
+const STATUS_COLORS = {
+  pending: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
+  resolved: 'text-green-400 bg-green-400/10 border-green-400/20',
+  rejected: 'text-red-400 bg-red-400/10 border-red-400/20',
+  'under review': 'text-brand-400 bg-brand-400/10 border-brand-400/20',
+};
+
 export default function Dashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -75,7 +82,6 @@ export default function Dashboard() {
 
         {loading ? (
           <div className="space-y-6">
-            {/* Skeleton loaders */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[1,2,3,4].map(i => (
                 <div key={i} className="glass rounded-2xl p-5 animate-pulse">
@@ -88,7 +94,7 @@ export default function Dashboard() {
           </div>
         ) : stats ? (
           <div className="space-y-6">
-            {/* Stats cards */}
+            {/* Analysis Stats cards - row 1 */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { label: 'Safety Score', value: `${stats.safetyScore}%`, icon: '🛡️', color: 'text-green-400' },
@@ -104,6 +110,24 @@ export default function Dashboard() {
                 </motion.div>
               ))}
             </div>
+
+            {/* Complaint Stats cards - row 2 */}
+            {stats.complaints && (
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { label: 'My Complaints', value: stats.complaints.total, icon: '📋', color: 'text-brand-400' },
+                  { label: 'Pending', value: stats.complaints.pending, icon: '⏳', color: 'text-yellow-400' },
+                  { label: 'Resolved', value: stats.complaints.resolved, icon: '✅', color: 'text-green-400' },
+                ].map(s => (
+                  <motion.div key={s.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                    className="glass rounded-2xl p-5">
+                    <div className="text-2xl mb-2">{s.icon}</div>
+                    <div className={`font-display text-3xl font-bold ${s.color}`}>{s.value}</div>
+                    <div className="text-slate-500 text-xs mt-1">{s.label}</div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
 
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Bar chart */}
@@ -175,6 +199,34 @@ export default function Dashboard() {
                           {a.result.label}
                         </span>
                         <span className="text-slate-600 text-xs">{new Date(a.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Recent Complaints */}
+            {stats.complaints?.recent?.length > 0 && (
+              <div className="glass rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-white font-semibold text-sm">Recent Complaints</h3>
+                  <Link to="/my-complaints" className="text-brand-400 hover:text-brand-300 text-xs transition-colors">
+                    View all →
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  {stats.complaints.recent.map((c, i) => (
+                    <div key={i} className="flex items-center justify-between px-4 py-3 rounded-xl bg-dark-700/50 text-sm">
+                      <div className="flex-1 mr-4 min-w-0">
+                        <p className="text-slate-300 truncate font-medium">{c.title || c.type || 'Complaint'}</p>
+                        <p className="text-slate-500 text-xs mt-0.5 truncate">{c.description?.slice(0, 60)}{c.description?.length > 60 ? '…' : ''}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className={`text-xs font-semibold capitalize px-2 py-0.5 rounded-full border ${STATUS_COLORS[c.status] || 'text-slate-400 bg-white/5 border-white/10'}`}>
+                          {c.status}
+                        </span>
+                        <span className="text-slate-600 text-xs">{new Date(c.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   ))}

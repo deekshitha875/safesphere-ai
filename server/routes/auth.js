@@ -31,6 +31,37 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Google Sign-In
+router.post('/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) return res.status(400).json({ message: 'No credential provided' });
+
+    // Verify token with Google
+    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${credential}`);
+    if (!googleRes.ok) return res.status(401).json({ message: 'Invalid Google token' });
+
+    const payload = await googleRes.json();
+    if (payload.error) return res.status(401).json({ message: 'Google token verification failed' });
+
+    const { email, name, picture } = payload;
+    if (!email) return res.status(400).json({ message: 'Email not found in Google token' });
+
+    // Find or create user
+    let user = await User.findOne({ email });
+    if (!user) {
+      // New user via Google - generate a random password they'll never use
+      const randomPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
+      user = await User.create({ name: name || email.split('@')[0], email, password: randomPassword, avatar: picture });
+    }
+
+    res.json({ token: sign(user._id), user: { id: user._id, name: user.name, email: user.email, plan: user.plan, role: user.role } });
+  } catch (err) {
+    console.error('Google auth error:', err);
+    res.status(500).json({ message: 'Google sign-in failed' });
+  }
+});
+
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
@@ -65,7 +96,7 @@ router.post('/forgot-password', async (req, res) => {
             <p style="color:#94a3b8;font-size:14px">If you did not request this, ignore this email.</p>
           </div>
           <div style="padding:16px 24px;border-top:1px solid rgba(255,255,255,0.05);text-align:center">
-            <p style="color:#475569;font-size:11px;margin:0">© 2025 SafeSphere AI</p>
+            <p style="color:#475569;font-size:11px;margin:0">\u00a9 2025 SafeSphere AI</p>
           </div>
         </div>
       `,
