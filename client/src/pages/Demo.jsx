@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -19,6 +20,7 @@ const LABEL_CONFIG = {
 };
 
 export default function Demo() {
+  const { user } = useAuth();
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -30,9 +32,17 @@ export default function Demo() {
     setLoading(true);
     setResult(null);
     try {
-      const { data } = await axios.post('/api/analyze/demo', { text: t });
-      setResult({ text: t, ...data.result });
-      setHistory(prev => [{ text: t, ...data.result }, ...prev.slice(0, 4)]);
+      let resultData;
+      if (user) {
+        // Save to DB when logged in so dashboard stats update
+        const { data } = await axios.post('/api/analyze', { text: t });
+        resultData = data.analysis.result;
+      } else {
+        const { data } = await axios.post('/api/analyze/demo', { text: t });
+        resultData = data.result;
+      }
+      setResult({ text: t, ...resultData });
+      setHistory(prev => [{ text: t, ...resultData }, ...prev.slice(0, 4)]);
     } catch {
       setResult({ error: true });
     } finally {
@@ -53,6 +63,7 @@ export default function Demo() {
             Try SafeSphere AI <span className="gradient-text">Live</span>
           </h1>
           <p className="text-slate-400">Type any message and watch our AI analyze it in real time.</p>
+          {user && <p className="text-green-400 text-xs mt-2 bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-1.5 inline-block">Results are saved to your dashboard</p>}
         </motion.div>
 
         {/* Input */}
