@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
@@ -43,66 +43,32 @@ router.post('/forgot-password', async (req, res) => {
       { resetToken: otp, resetTokenExpiry: Date.now() + 15 * 60 * 1000 }
     );
 
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      requireTLS: true,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-      tls: { rejectUnauthorized: false },
-    });
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
-    const htmlBody = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8" />
-        <style>
-          body { font-family: 'Segoe UI', Arial, sans-serif; background: #0f172a; margin: 0; padding: 0; }
-          .container { max-width: 480px; margin: 40px auto; background: #1e293b; border-radius: 16px; overflow: hidden; border: 1px solid rgba(99,102,241,0.2); }
-          .header { background: linear-gradient(135deg, #6366f1, #9333ea); padding: 32px 24px; text-align: center; }
-          .header h1 { color: #fff; margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
-          .header p { color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px; }
-          .body { padding: 32px 24px; }
-          .body p { color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 16px; }
-          .otp-box { background: #0f172a; border: 2px solid #6366f1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0; }
-          .otp-code { font-size: 40px; font-weight: 800; letter-spacing: 10px; color: #818cf8; font-family: monospace; }
-          .otp-note { color: #64748b; font-size: 12px; margin-top: 8px; }
-          .footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
-          .footer p { color: #475569; font-size: 11px; margin: 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>🛡️ SafeSphere AI</h1>
-            <p>Password Reset Request</p>
-          </div>
-          <div class="body">
-            <p>Hi there,</p>
-            <p>We received a request to reset your SafeSphere AI account password. Use the OTP below to proceed:</p>
-            <div class="otp-box">
-              <div class="otp-code">${otp}</div>
-              <div class="otp-note">Valid for 15 minutes only</div>
-            </div>
-            <p>If you did not request a password reset, please ignore this email. Your account remains secure.</p>
-          </div>
-          <div class="footer">
-            <p>&copy; 2025 SafeSphere AI &mdash; Cybercrime Reporting Platform</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-
-    await transporter.sendMail({
-      from: `"SafeSphere AI" <${process.env.EMAIL_USER}>`,
+    await resend.emails.send({
+      from: 'SafeSphere AI <onboarding@resend.dev>',
       to: email,
       subject: 'SafeSphere AI - Password Reset OTP',
-      html: htmlBody,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:480px;margin:40px auto;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid rgba(99,102,241,0.2)">
+          <div style="background:linear-gradient(135deg,#6366f1,#9333ea);padding:32px 24px;text-align:center">
+            <h1 style="color:#fff;margin:0;font-size:22px;font-weight:700">SafeSphere AI</h1>
+            <p style="color:rgba(255,255,255,0.8);margin:6px 0 0;font-size:13px">Password Reset Request</p>
+          </div>
+          <div style="padding:32px 24px">
+            <p style="color:#94a3b8;font-size:14px;line-height:1.6">Hi there,</p>
+            <p style="color:#94a3b8;font-size:14px;line-height:1.6">Use the OTP below to reset your SafeSphere AI password:</p>
+            <div style="background:#0f172a;border:2px solid #6366f1;border-radius:12px;padding:20px;text-align:center;margin:24px 0">
+              <div style="font-size:40px;font-weight:800;letter-spacing:10px;color:#818cf8;font-family:monospace">${otp}</div>
+              <div style="color:#64748b;font-size:12px;margin-top:8px">Valid for 15 minutes only</div>
+            </div>
+            <p style="color:#94a3b8;font-size:14px">If you did not request this, ignore this email.</p>
+          </div>
+          <div style="padding:16px 24px;border-top:1px solid rgba(255,255,255,0.05);text-align:center">
+            <p style="color:#475569;font-size:11px;margin:0">© 2025 SafeSphere AI</p>
+          </div>
+        </div>
+      `,
     });
 
     res.json({ message: 'OTP sent to your email' });
