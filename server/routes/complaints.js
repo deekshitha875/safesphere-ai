@@ -185,7 +185,7 @@ function calculateSeverity(detectedWords, text) {
 // Guest complaint — no login required (anyone can report)
 router.post('/guest', async (req, res) => {
   try {
-    const { offenderName, offenderPlatform, incidentDescription, harmfulContent, reporterName, reporterEmail } = req.body;
+    const { offenderName, offenderPlatform, incidentDescription, harmfulContent, reporterName, reporterEmail, evidenceImages } = req.body;
     if (!offenderName || !offenderPlatform || !incidentDescription || !harmfulContent)
       return res.status(400).json({ message: 'All fields are required' });
     const detectedWords = detectHarmfulWords(harmfulContent + ' ' + incidentDescription);
@@ -210,7 +210,7 @@ router.post('/guest', async (req, res) => {
 // Submit a complaint (logged-in users)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { offenderName, offenderPlatform, incidentDescription, harmfulContent } = req.body;
+    const { offenderName, offenderPlatform, incidentDescription, harmfulContent, evidenceImages } = req.body;
     if (!offenderName || !offenderPlatform || !incidentDescription || !harmfulContent)
       return res.status(400).json({ message: 'All fields are required' });
 

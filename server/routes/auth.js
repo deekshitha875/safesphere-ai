@@ -38,9 +38,10 @@ router.post('/forgot-password', async (req, res) => {
     if (!user) return res.status(404).json({ message: 'No account with this email' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.resetToken = otp;
-    user.resetTokenExpiry = Date.now() + 15 * 60 * 1000;
-    await user.save();
+    await User.updateOne(
+      { _id: user._id },
+      { resetToken: otp, resetTokenExpiry: Date.now() + 15 * 60 * 1000 }
+    );
 
     const transporter = nodemailer.createTransport({
       service: 'gmail',

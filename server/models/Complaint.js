@@ -9,6 +9,7 @@ const complaintSchema = new mongoose.Schema({
   incidentDescription: { type: String, required: true },
   harmfulContent: { type: String, required: true },
   detectedWords: [{ type: String }],
+  evidenceImages: [{ name: String, data: String }],
   severity: { type: String, enum: ['low', 'medium', 'high', 'critical'], default: 'medium' },
   status: { type: String, enum: ['pending', 'under_review', 'resolved', 'dismissed'], default: 'pending' },
   assignedAdmin: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

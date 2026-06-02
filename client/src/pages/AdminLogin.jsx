@@ -88,33 +88,7 @@ export default function AdminLogin() {
             {loading ? "Verifying..." : "Access Admin Control Center"}
           </motion.button>
 
-          <div className="border-t pt-5" style={{ borderColor: "rgba(239,68,68,0.15)" }}>
-            <p className="text-slate-500 text-xs text-center mb-3 uppercase tracking-wider font-semibold">Demo Admin Accounts</p>
-            <div className="space-y-2">
-              {[
-                { email: "admin1@safesphere.ai", name: "Admin Arjun" },
-                { email: "admin2@safesphere.ai", name: "Admin Priya" },
-                { email: "admin3@safesphere.ai", name: "Admin Rahul" },
-              ].map(a => (
-                <motion.button key={a.email} type="button" whileHover={{ x: 4 }}
-                  onClick={() => setForm({ email: a.email, password: "Admin@123" })}
-                  className="w-full px-4 py-2.5 rounded-xl text-left flex items-center gap-3 transition-all"
-                  style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.1)" }}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(239,68,68,0.3)"}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(239,68,68,0.1)"}>
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-red-400 text-xs font-bold shrink-0"
-                    style={{ background: "rgba(239,68,68,0.15)" }}>A</div>
-                  <div>
-                    <span className="text-white text-xs font-semibold">{a.name}</span>
-                    <span className="text-slate-500 text-xs ml-2">{a.email}</span>
-                  </div>
-                  <span className="ml-auto text-slate-600 text-xs">Click</span>
-                </motion.button>
-              ))}
-            </div>
-            <p className="text-slate-600 text-xs text-center mt-3">Password: Admin@123</p>
-          </div>
-        </form>
+          </form>
 
         <div className="mt-6 text-center">
           <div className="flex items-center gap-3 mb-4">
