@@ -223,6 +223,24 @@ export default function AdminPanel() {
                   </button>
                 ))}
               </div>
+              <div style={{ padding: 20, borderRadius: 14, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <span style={{ color: "#fff", fontWeight: 600, fontSize: 14 }}>Platform Breakdown</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {["Instagram","WhatsApp","Twitter/X","Facebook","Telegram","Discord","Other"].map(p => {
+                    const count = complaints.filter(c => c.offenderPlatform === p).length;
+                    if (count === 0) return null;
+                    return (
+                      <div key={p} style={{ padding: "6px 12px", borderRadius: 8, background: "rgba(99,102,241,0.1)", border: "1px solid rgba(99,102,241,0.2)", display: "flex", alignItems: "center", gap: 8 }}>
+                        <span style={{ color: "#818cf8", fontSize: 12, fontWeight: 600 }}>{p}</span>
+                        <span style={{ background: "#6366f1", color: "#fff", borderRadius: "50%", width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>{count}</span>
+                      </div>
+                    );
+                  })}
+                  {complaints.length === 0 && <p style={{ color: "#475569", fontSize: 13 }}>No complaints yet</p>}
+                </div>
+              </div>
             </div>
           )}
 

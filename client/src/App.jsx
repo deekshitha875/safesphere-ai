@@ -20,10 +20,12 @@ import AdminPanel from "./pages/AdminPanel";
 import NotFound from "./pages/NotFound";
 import ForgotPassword from "./pages/ForgotPassword";
 import Profile from "./pages/Profile";
+import ProgressBar from "./components/ProgressBar";
 
 function UserLayout({ children }) {
   return (
     <div className="min-h-screen flex flex-col relative">
+      <ProgressBar />
       <AnimatedBg />
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />

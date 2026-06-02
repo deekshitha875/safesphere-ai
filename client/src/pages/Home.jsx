@@ -1,5 +1,6 @@
 import Hero from '../sections/Hero';
 import Features from '../sections/Features';
+import WhyWeBuilt from '../sections/WhyWeBuilt';
 import HowItWorks from '../sections/HowItWorks';
 import DashboardPreview from '../sections/DashboardPreview';
 import UseCases from '../sections/UseCases';
@@ -14,6 +15,7 @@ export default function Home() {
     <>
       <Hero />
       <Features />
+      <WhyWeBuilt />
       <HowItWorks />
       <DashboardPreview />
       <UseCases />

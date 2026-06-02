@@ -66,8 +66,41 @@ router.patch('/complaints/:id', authMiddleware, adminOnly, async (req, res) => {
     const { status, adminNotes, adminAction } = req.body;
     const update = { status, adminNotes, adminAction, updatedAt: new Date() };
     if (status === 'resolved') update.resolvedAt = new Date();
-    const complaint = await Complaint.findByIdAndUpdate(req.params.id, update, { new: true });
-    res.json({ complaint, message: 'Complaint updated successfully' });
+    await Complaint.findByIdAndUpdate(req.params.id, update, { new: true });
+
+    // Get the full complaint with reporter email
+    const { Resend } = require('resend');
+    const resend = new Resend(process.env.RESEND_API_KEY);
+    const updated = await Complaint.findById(req.params.id).populate('reportedBy', 'email name');
+    const reporterEmail = updated?.reportedBy?.email || updated?.reportedByEmail;
+
+    if (reporterEmail && status) {
+      const statusLabels = { pending: 'Pending', under_review: 'Under Review', resolved: 'Resolved ✅', dismissed: 'Dismissed' };
+      try {
+        await resend.emails.send({
+          from: 'SafeSphere AI <onboarding@resend.dev>',
+          to: reporterEmail,
+          subject: `SafeSphere AI - Your complaint has been ${statusLabels[status] || status}`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:40px auto;background:#1e293b;border-radius:16px;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#6366f1,#9333ea);padding:24px;text-align:center">
+              <h1 style="color:#fff;margin:0;font-size:20px">SafeSphere AI</h1>
+              <p style="color:rgba(255,255,255,0.8);margin:4px 0 0;font-size:13px">Complaint Status Update</p>
+            </div>
+            <div style="padding:24px">
+              <p style="color:#94a3b8;font-size:14px">Your complaint against <strong style="color:#f87171">${updated.offenderName}</strong> on ${updated.offenderPlatform} has been updated.</p>
+              <div style="background:#0f172a;border:2px solid #6366f1;border-radius:12px;padding:16px;text-align:center;margin:20px 0">
+                <div style="font-size:22px;font-weight:800;color:#818cf8">${statusLabels[status] || status}</div>
+              </div>
+              ${adminAction ? `<p style="color:#94a3b8;font-size:13px"><strong style="color:#4ade80">Action Taken:</strong> ${adminAction}</p>` : ''}
+              ${adminNotes ? `<p style="color:#94a3b8;font-size:13px"><strong style="color:#818cf8">Admin Notes:</strong> ${adminNotes}</p>` : ''}
+              <p style="color:#64748b;font-size:12px">Login to SafeSphere AI to view full details.</p>
+            </div>
+          </div>`,
+        });
+      } catch(emailErr) { console.error('Email notification error:', emailErr.message); }
+    }
+
+    res.json({ complaint: updated, message: 'Complaint updated successfully' });
   } catch {
     res.status(500).json({ message: 'Server error' });
   }

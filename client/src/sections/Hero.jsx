@@ -57,6 +57,36 @@ function TiltCard({ children }) {
   );
 }
 
+function TypeWriter() {
+  const words = ['Detecting', 'Preventing', 'Protecting', 'Empowering'];
+  const [idx, setIdx] = useState(0);
+  const [displayed, setDisplayed] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const word = words[idx];
+    if (!deleting && displayed.length < word.length) {
+      const t = setTimeout(() => setDisplayed(word.slice(0, displayed.length + 1)), 100);
+      return () => clearTimeout(t);
+    } else if (!deleting && displayed.length === word.length) {
+      const t = setTimeout(() => setDeleting(true), 1500);
+      return () => clearTimeout(t);
+    } else if (deleting && displayed.length > 0) {
+      const t = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 60);
+      return () => clearTimeout(t);
+    } else if (deleting && displayed.length === 0) {
+      setDeleting(false);
+      setIdx((idx + 1) % words.length);
+    }
+  }, [displayed, deleting, idx]);
+
+  return (
+    <div className="text-brand-400 font-bold text-lg mb-3 font-mono min-h-7">
+      {displayed}<span className="animate-pulse">|</span>
+    </div>
+  );
+}
+
 export default function Hero() {
   const [scanProgress, setScanProgress] = useState(0);
   const [activeMsg, setActiveMsg] = useState(0);
@@ -121,6 +151,7 @@ export default function Hero() {
               Cyberbullying Detection
             </motion.h1>
 
+            <TypeWriter />
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
               className="text-slate-400 text-lg leading-relaxed mb-8 max-w-xl">
               SafeSphere AI monitors, detects, and prevents online harassment in real time — protecting students, families, and communities across every digital platform.
