@@ -91,23 +91,34 @@ export default function Login() {
             <GoogleLogin
               onSuccess={async (credentialResponse) => {
                 try {
-                  const { data } = await axios.post('/api/auth/google', { credential: credentialResponse.credential });
-                  // Save to localStorage and update axios header
+                  setError('');
+                  const { data } = await axios.post('/api/auth/google', {
+                    credential: credentialResponse.credential,
+                  });
+                  if (!data.token || !data.user) {
+                    setError('Google sign-in failed: invalid response');
+                    return;
+                  }
+                  // Save session
                   localStorage.setItem('ss_token', data.token);
                   localStorage.setItem('ss_user', JSON.stringify(data.user));
                   axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
-                  // Use window.location for a full reload so AuthContext re-initializes from localStorage
-                  window.location.replace(data.user.role === 'admin' ? '/admin' : '/dashboard');
+                  // Hard redirect so AuthContext reinitializes cleanly
+                  window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard';
                 } catch (err) {
-                  console.error('Google auth error:', err);
-                  setError(err.response?.data?.message || 'Google sign-in failed. Please try again.');
+                  console.error('Google auth error:', err?.response?.data || err.message);
+                  setError(err?.response?.data?.message || 'Google sign-in failed: ' + (err.message || 'unknown error'));
                 }
               }}
-              onError={() => setError('Google sign-in failed')}
+              onError={(err) => {
+                console.error('Google OAuth error:', err);
+                setError('Google sign-in was cancelled or failed. Please try again.');
+              }}
               theme="filled_black"
               shape="rectangular"
               text="signin_with_google"
               width="360"
+              useOneTap={false}
             />
           </div>
 

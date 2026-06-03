@@ -42,7 +42,13 @@ router.post('/google', async (req, res) => {
     if (!googleRes.ok) return res.status(401).json({ message: 'Invalid Google token' });
 
     const payload = await googleRes.json();
-    if (payload.error) return res.status(401).json({ message: 'Google token verification failed' });
+    if (payload.error) return res.status(401).json({ message: 'Google token verification failed: ' + payload.error });
+
+    // Ensure the token was issued for our app
+    const validAudiences = [process.env.GOOGLE_CLIENT_ID].filter(Boolean);
+    if (validAudiences.length > 0 && !validAudiences.includes(payload.aud)) {
+      return res.status(401).json({ message: 'Token audience mismatch' });
+    }
 
     const { email, name, picture } = payload;
     if (!email) return res.status(400).json({ message: 'Email not found in Google token' });
