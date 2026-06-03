@@ -92,11 +92,15 @@ export default function Login() {
               onSuccess={async (credentialResponse) => {
                 try {
                   const { data } = await axios.post('/api/auth/google', { credential: credentialResponse.credential });
+                  // Save to localStorage and update axios header
                   localStorage.setItem('ss_token', data.token);
                   localStorage.setItem('ss_user', JSON.stringify(data.user));
-                  window.location.href = data.user.role === 'admin' ? '/admin' : '/dashboard';
+                  axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.token;
+                  // Use window.location for a full reload so AuthContext re-initializes from localStorage
+                  window.location.replace(data.user.role === 'admin' ? '/admin' : '/dashboard');
                 } catch (err) {
-                  setError('Google sign-in failed. Please try again.');
+                  console.error('Google auth error:', err);
+                  setError(err.response?.data?.message || 'Google sign-in failed. Please try again.');
                 }
               }}
               onError={() => setError('Google sign-in failed')}

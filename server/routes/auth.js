@@ -50,12 +50,23 @@ router.post('/google', async (req, res) => {
     // Find or create user
     let user = await User.findOne({ email });
     if (!user) {
-      // New user via Google - generate a random password they'll never use
-      const randomPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
-      user = await User.create({ name: name || email.split('@')[0], email, password: randomPassword, avatar: picture });
+      // New user via Google - generate a random password they will never use
+      const randomPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12) + 'Aa1!';
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        password: randomPassword,
+        avatar: picture || '',
+        googleId: payload.sub || '',
+      });
+    } else {
+      // Update avatar and googleId if not set
+      if (!user.googleId) {
+        await User.updateOne({ _id: user._id }, { googleId: payload.sub || '', avatar: picture || user.avatar });
+      }
     }
 
-    res.json({ token: sign(user._id), user: { id: user._id, name: user.name, email: user.email, plan: user.plan, role: user.role } });
+    res.json({ token: sign(user._id), user: { id: user._id, name: user.name, email: user.email, plan: user.plan, role: user.role, avatar: user.avatar } });
   } catch (err) {
     console.error('Google auth error:', err);
     res.status(500).json({ message: 'Google sign-in failed' });
