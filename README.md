@@ -79,7 +79,7 @@ cd client && npm run dev
 
 ## Live Demo
 
-Visit [safesphere-ai-gamma.vercel.app](https://safesphere-ai-gamma.vercel.app)
+Visit [safesphere-ai-gamma.vercel.app](https://safesphere-ai-gamma.vercel.app)   
 
 ## License
 
