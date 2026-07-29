@@ -51,7 +51,7 @@ cd server && npm install
 cd ../client && npm install
 ```
 
-### Environment Variables
+### Environment Variables 
 
 Create `server/.env`:
 ```
