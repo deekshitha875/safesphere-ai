@@ -1,7 +1,7 @@
 # SafeSphere AI 🛡️
 
 **AI-Powered Cyberbullying Detection & Reporting Platform**
-
+  
 [![Live Demo](https://img.shields.io/badge/Live-safesphere--ai--gamma.vercel.app-6366f1?style=for-the-badge)](https://safesphere-ai-gamma.vercel.app)
 [![Backend](https://img.shields.io/badge/API-Render-4ade80?style=for-the-badge)](https://safesphere-ai-rcdt.onrender.com/api/health)
 
